@@ -1,0 +1,24 @@
+name: Continuous Integration Workflow
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run tests
+        run: |
+          make setup
+          make test
+  push:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build and Push Artifact - Docker Image
+        run: |
+          make push user=${{ github.actor }} token=${{ secrets.GITHUB_TOKEN }}
